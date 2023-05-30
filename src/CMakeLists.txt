@@ -58,6 +58,9 @@ FetchContent_MakeAvailable(tree-gen)
 # header and source file paths.
 add_subdirectory(func-gen)
 
+find_package(antlr4-generator REQUIRED)
+find_package(antlr4-runtime REQUIRED)
+
 #-------------------------------------------------------------------------------
 # cQASM common code generation and inclusion
 #-------------------------------------------------------------------------------
@@ -177,28 +180,37 @@ list(APPEND CQASM_V1_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/v1/cqasm-functions-gen
 #-------------------------------------------------------------------------------
 add_subdirectory(v3)
 
+# Set path to generator
+set(ANTLR4_JAR_LOCATION
+    ${PROJECT_SOURCE_DIR}/third_party/antlr/antlr-4.13.0-complete.jar
+)
+
 # Generate the lexer.
-flex_target(cqasm-v3-lexer
-    "${CMAKE_CURRENT_SOURCE_DIR}/v3/cqasm-lexer.l"
-    "${CMAKE_CURRENT_BINARY_DIR}/v3/cqasm-lexer.cpp"
-    COMPILE_FLAGS
-    "--header-file=${CMAKE_CURRENT_BINARY_DIR}/v3/cqasm-lexer.hpp ${flex_win_compat}"
-    )
-list(APPEND CQASM_V3_SOURCES ${FLEX_cqasm-v3-lexer_OUTPUTS})
+antlr4_generate(
+    cqasm-v3-lexer                                 # target name
+    ${CMAKE_CURRENT_SOURCE_DIR}/v3/cqasm-lexer.g4  # input file with lexer definition
+    LEXER                                          # type of rules contained in the input
+    FALSE                                          # should a listener interface be generated
+    FALSE                                          # should a visitor interface be generated
+    "cqasm-v3-lexer"                               # C++ namespace to place the generated classes in
+)
 
 # Generate the parser.
-bison_target(cqasm-v3-parser
-    "${CMAKE_CURRENT_SOURCE_DIR}/v3/cqasm-parser.y"
-    "${CMAKE_CURRENT_BINARY_DIR}/v3/cqasm-parser.cpp"
-    COMPILE_FLAGS
-    "-rall --report-file=${CMAKE_CURRENT_BINARY_DIR}/v3/cqasm-parser.txt -Werror=conflicts-sr -Werror=conflicts-rr"
-    )
-list(APPEND CQASM_V3_SOURCES ${BISON_cqasm-v3-parser_OUTPUTS})
-
-# Dependency between lexer and parser.
-add_flex_bison_dependency(
-    cqasm-v3-lexer
+antlr4_generate(
     cqasm-v3-parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/v3/cqasm-parser.g4
+    PARSER
+    FALSE
+    TRUE
+    "cqasm-v3-parser"
+    "${ANTLR4_TOKEN_FILES_cqasm-v3-lexer}"          # additional files on which the input depends
+    "${ANTLR4_TOKEN_DIRECTORY_cqasm-v3-lexer}"      # library path to use during generation
+)
+
+# Add generated source files.
+list(APPEND CQASM_V3_SOURCES
+    ${ANTLR4_SRC_FILES_cqasm-v3-antlr-lexer}
+    ${ANTLR4_SRC_FILES_cqasm-v3-antlr-parser}
 )
 
 # Generate the abstract syntax tree classes.
@@ -259,6 +271,10 @@ add_library(
     ${CQASM_V3_SOURCES}
 )
 
+add_dependencies(cqasm-lib-obj
+    antlr4_static
+)
+
 target_compile_definitions(cqasm-lib-obj PRIVATE ${TREE_LIB_PRIVATE_DEFS})
 
 # The src directory and binary directory (for generated header files) are private.
@@ -276,11 +292,17 @@ target_include_directories(
     # Instead, just its contents are copied.
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include/"
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/../include/"
+    PUBLIC ${ANTLR4_INCLUDE_DIR}
+    PUBLIC ${ANTLR4_INCLUDE_DIR_cqasm-v3-lexer}
+    PUBLIC ${ANTLR4_INCLUDE_DIR_cqasm-v3-parser}
 )
 
 target_compile_features(cqasm-lib-obj PUBLIC cxx_std_20)
 
-target_link_libraries(cqasm-lib-obj PUBLIC tree-lib-obj)
+target_link_libraries(cqasm-lib-obj PUBLIC
+    tree-lib-obj
+    antlr4_static
+)
 
 # fPIC: otherwise some weirdness happens with pthreads or something when linking statically.
 if(MSVC)
