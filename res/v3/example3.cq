@@ -1,0 +1,36 @@
+version(3.0)
+
+qubit[5] q
+bit[5] b
+
+h(q[0])
+
+# Measurement outcome in b0
+b[0] = measure_z(q[0])
+
+# Simple binary-controlled gate
+# Apply Pauli-X to q[1] if b[0]=1
+if (b[0]) {
+    x(q[1])
+}
+b[2:4] = measure_z(q[2:4])
+
+# Multi-binary controlled gate
+# Apply pauli-x to q4 if b2=1 and b3=1 and b4=1
+if (b[2:4]) {
+    x(q[4])
+}
+
+# Binary controlled gate using an arbitrary mask:
+# We want to apply a Pauli-X to q[4] if b[0]=0 and b[1]=1
+# negate b0
+not(b[0])
+
+# Multi-bits controlled X gate
+if (b[0,1]) {
+    x(q[4])
+}
+
+# Restore the measurement register
+not(b[0])
+@ openql.mapper.optimize()

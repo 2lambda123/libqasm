@@ -1,0 +1,7 @@
+version(3.0)
+
+qubit[2] q
+
+# Address qubits via their names
+cnot(q[0], q[1])
+cnot(q[1], q[2])

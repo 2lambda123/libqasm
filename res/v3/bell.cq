@@ -1,0 +1,24 @@
+version(3.0)
+
+# Define a quantum register of 2 qubits
+qubit[2] q
+
+# Mapping
+q0 = q[0]
+q1 = q[1]
+
+# Prep
+prep_z(q0) prep_z(q1)
+
+# Create a Bell pair via a Hadamard rotation
+h(q0)
+
+# Followed by a CNOT gate
+# q[0]: control qubit, q[1]: target qubit
+cnot(q0,q1)
+
+# Measure both qubits to test correlations
+bit[2] b = measure(q)
+
+> display_bits
+    b @qx_emulator.display

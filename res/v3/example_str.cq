@@ -1,0 +1,5 @@
+version(3.0)
+
+qubit[2] q
+x(q[0])
+y(q[1])

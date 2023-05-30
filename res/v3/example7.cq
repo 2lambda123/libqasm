@@ -1,0 +1,40 @@
+version(3.0)
+
+# Define a quantum register of 3 qubits
+qubit[3] q
+
+# Reset the counters for the average procedure
+@qx_emulator.reset_averaging
+
+# Prepare and measure the quantum state 1000 times
+# to accumulate a large outcome statistics
+
+> averaging
+for (int i = 0; i < 1000; i++) {
+    # State preparation
+    prep_z(q[0:2])
+    rx(q[0], 3.14) ry(q[1], 0.23) h(q[2])
+    rx(q[2], 3.14)
+    cnot(q[2], q[1])
+    z(q[1]) rx(q[2], 1.57)
+
+    # Measure of $Z_1$
+    int b1 = measure_z(q[1])
+
+    # The corresponding average is automatically updated
+    # Measure of $X_0 X_2$
+    measure_parity q[0], x, q[2], x
+}
+
+# The corresponding average is automatically updated
+# Estimate the observable A
+> result
+
+# Show the average of $X_0 X_2$ together with its test outcome
+b0 @qx_emulator.display
+
+# Show the average of $Z_1$ together with its latest outcome
+b1 @qx_emulator.display
+
+# The expectation value of $\hat{A}$ follows
+# from a straightforward postprocess

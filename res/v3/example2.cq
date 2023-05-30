@@ -1,0 +1,25 @@
+version(3.0)
+
+# Define a quantum register of 3 qubits
+qubit[3] q
+
+# Rename qubits
+data = q[0]
+ancilla = q[1]
+output = q[2]
+extra = q[1]
+
+# Address qubits via their names
+prep_z(data)
+prep_z(ancilla)
+prep_z(output)
+cnot(data, ancilla)
+cnot(data, extra)
+
+# Rename classical bit
+bit error_syndrome = measure(ancilla)
+
+# Apply binary controlled Pauli-X gate
+if (error_syndrome) {
+    x(output)
+}
