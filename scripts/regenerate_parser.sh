@@ -1,13 +1,12 @@
 #!/bin/bash
 
-if [[ $# -ne 3 ]]; then
-    echo "Usage: regenerate_parser.sh <INPUT FOLDER> <OUTPUT FOLDER> <ANTLR_JAR_LOCATION>"
+if [[ $# -ne 2 ]]; then
+    echo "Usage: regenerate_parser.sh <INPUT FOLDER> <OUTPUT FOLDER>"
     echo "Where:"
     echo "    INPUT_FOLDER: folder containing the grammar files."
     echo "    OUTPUT_FOLDER: folder where generated files will be left."
-    echo "    ANTLR_JAR_LOCATION: path to antlr jar file."
     echo "Example:"
-    echo "    regenerate_parser.sh ../src/v3 ../build/Debug/src/v3 ../third_party/antlr/antlr-4.13.0-complete.jar"
+    echo "    regenerate_parser.sh ../src/v3 ../build/Debug/src/v3"
 fi
 
 if ! command -v java &> /dev/null; then
@@ -17,9 +16,18 @@ fi
 
 input_folder=$1
 output_folder=$2
-antlr_jar_location=$3
 
-export CLASSPATH=".:$antlr_jar_location:$CLASSPATH"
+antlr_jar_version="4.13.0"
+antlr_jar_filename="antlr-${antlr_jar_version}-complete.jar"
+antlr_jar_url="https://www.antlr.org/download/${antlr_jar_filename}"
+
+export ANTLR_HOME="~/.local/bin"
+export ANTLR_JAR="${ANTLR_HOME}/${antlr_jar_filename}"
+export CLASSPATH=".:${ANTLR_JAR}:${CLASSPATH}"
+
+if [[ ! -f "${ANTLR_JAR}" ]]; then
+    wget -P "${ANTLR_HOME}" "${antlr_jar_url}"
+fi
 
 set -x  # echo on
-java -jar $antlr_jar_location -Xexact-output-dir -o $output_folder -Dlanguage=Cpp $input_folder/*.g4
+java -jar "${ANTLR_JAR}" -Xexact-output-dir -o "${output_folder}" -Dlanguage=Cpp "${input_folder}"/*.g4
