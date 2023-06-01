@@ -58,7 +58,6 @@ FetchContent_MakeAvailable(tree-gen)
 # header and source file paths.
 add_subdirectory(func-gen)
 
-find_package(antlr4-generator REQUIRED)
 find_package(antlr4-runtime REQUIRED)
 
 #-------------------------------------------------------------------------------
@@ -180,37 +179,10 @@ list(APPEND CQASM_V1_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/v1/cqasm-functions-gen
 #-------------------------------------------------------------------------------
 add_subdirectory(v3)
 
-# Set path to generator
-set(ANTLR4_JAR_LOCATION
-    ${PROJECT_SOURCE_DIR}/third_party/antlr/antlr-4.13.0-complete.jar
-)
-
-# Generate the lexer.
-antlr4_generate(
-    cqasm-v3-lexer                                 # target name
-    ${CMAKE_CURRENT_SOURCE_DIR}/v3/cqasm-lexer.g4  # input file with lexer definition
-    LEXER                                          # type of rules contained in the input
-    FALSE                                          # should a listener interface be generated
-    FALSE                                          # should a visitor interface be generated
-    "cqasm-v3-lexer"                               # C++ namespace to place the generated classes in
-)
-
-# Generate the parser.
-antlr4_generate(
-    cqasm-v3-parser
-    ${CMAKE_CURRENT_SOURCE_DIR}/v3/cqasm-parser.g4
-    PARSER
-    FALSE
-    TRUE
-    "cqasm-v3-parser"
-    "${ANTLR4_TOKEN_FILES_cqasm-v3-lexer}"          # additional files on which the input depends
-    "${ANTLR4_TOKEN_DIRECTORY_cqasm-v3-lexer}"      # library path to use during generation
-)
-
 # Add generated source files.
 list(APPEND CQASM_V3_SOURCES
-    ${ANTLR4_SRC_FILES_cqasm-v3-antlr-lexer}
-    ${ANTLR4_SRC_FILES_cqasm-v3-antlr-parser}
+    "${CMAKE_CURRENT_BINARY_DIR}/v3/cqasm_lexer.cpp"
+    "${CMAKE_CURRENT_BINARY_DIR}/v3/cqasm_parser.cpp"
 )
 
 # Generate the abstract syntax tree classes.
@@ -292,9 +264,7 @@ target_include_directories(
     # Instead, just its contents are copied.
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include/"
     PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/../include/"
-    PUBLIC ${ANTLR4_INCLUDE_DIR}
-    PUBLIC ${ANTLR4_INCLUDE_DIR_cqasm-v3-lexer}
-    PUBLIC ${ANTLR4_INCLUDE_DIR_cqasm-v3-parser}
+    PUBLIC ${antlr4-runtime_INCLUDE_DIR}
 )
 
 target_compile_features(cqasm-lib-obj PUBLIC cxx_std_20)
