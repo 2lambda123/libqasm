@@ -3,9 +3,7 @@ name: Test
 on:
   push:
     branches:
-    - develop
-    - v3
-  pull_request:
+    - v3_develop
 
 jobs:
   cpp_cmake:

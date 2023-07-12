@@ -3,7 +3,7 @@ name: update_v3_distro
 on:
   push:
     branches:
-    - v3
+    - v3_develop
 
 jobs:
   v3_distro-artifact-upload:
