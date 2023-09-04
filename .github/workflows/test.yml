@@ -3,8 +3,7 @@ name: Test
 on:
   push:
     branches:
-    - develop
-  pull_request:
+    - toy_v1-2nd_iteration
 
 jobs:
   cpp-linux-macos-windows:
