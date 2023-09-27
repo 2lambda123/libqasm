@@ -554,7 +554,7 @@ AnalyzerHelper::AnalyzerHelper(
         result.root->api_version = analyzer.api_version;
 
         // Check and set the version.
-        analyze_version(*ast.version);
+        //analyze_version(*ast.version);
 
         // Handle the qubits statement. Qubit variables can be used instead of
         // the qubits keyword, in which case num_qubits is set to 0 to indicate
