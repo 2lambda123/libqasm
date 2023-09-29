@@ -1376,9 +1376,9 @@ void AnalyzerHelper::analyze_mapping(const ast::Mapping &mapping) {
 }
 
 /**
- * Analyzes the given declaration of one or more variables and, if valid,
- * adds them to the current scope. If an error occurs, the message is added
- * to the result error vector, and nothing is added to the scope.
+ * Analyzes the given declaration of one or more variables and,
+ * if valid, adds them to the current scope.
+ * If an error occurs, the message is added to the result error vector, and nothing is added to the scope.
  */
 void AnalyzerHelper::analyze_variables(const ast::Variables &variables) {
     try {
@@ -1389,7 +1389,7 @@ void AnalyzerHelper::analyze_variables(const ast::Variables &variables) {
         }
 
         // Figure out what type the variables should have.
-        auto type_name = utils::lowercase(variables.typ->name);
+        auto type_name = variables.typ->name;
         types::Type type{};
         if (type_name == "qubit") {
             type = tree::make<types::Qubit>();
