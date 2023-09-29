@@ -1,12 +1,9 @@
 #include "parsing.hpp"
-#include "v1x/cqasm.hpp"
 #include "v1x/cqasm-parse-helper.hpp"
-#include "v3x/cqasm.hpp"
 #include "v3x/cqasm-parse-helper.hpp"
 
 #include <filesystem>
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <sstream>
@@ -64,7 +61,7 @@ public:
 
         if (auto compare_result = version.compare("1.2"); compare_result <= 0) {
             parse_result = cq1x::parser::parse_string(input, "input.cq");
-        } else if (auto compare_result = version.compare("3.0"); compare_result == 0) {
+        } else if (compare_result = version.compare("3.0"); compare_result == 0) {
             parse_result = cq3x::parser::parse_string(input, "input.cq");
         } else {
             parse_result.errors.push_back(fmt::format("detected version {}", version));
@@ -275,5 +272,5 @@ void register_v1x_tests(const fs::path& subdir) {
 
 void register_v1x_tests() {
     //register_v1x_tests("parsing");
-    register_v1x_tests("toy-v1x-parsing");
+    register_v1x_tests("qi2_integration_test");
 }
