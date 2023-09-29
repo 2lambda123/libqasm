@@ -36,8 +36,9 @@ if(WIN32)
 else()
     set(flex_win_compat)
 endif()
-find_package(fmt 10.1.1)
+find_package(fmt 10.1.1 REQUIRED)
 find_package(Python3 REQUIRED)
+find_package(range-v3 REQUIRED)
 
 include(FetchContent)
 # tree-gen, a custom utility to generate classes for typed tree-like structures and enums with variants containing data.
@@ -228,6 +229,7 @@ target_compile_features(cqasm-lib-obj PUBLIC
 target_link_libraries(cqasm-lib-obj
     PRIVATE antlr4_static
     PRIVATE fmt::fmt
+    PRIVATE range-v3::range-v3
     PRIVATE tree-lib-obj
 )
 
