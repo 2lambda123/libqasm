@@ -42,9 +42,12 @@ ast::One<semantic::Program> AnalysisResult::unwrap(std::ostream &out) const {
 Analyzer::Analyzer(const std::string &api_version)
     : api_version(api_version), resolve_instructions(false), resolve_error_model(false)
 {
+    // QI2 integration test: temporarily removed this check
+    /*
     if (api_version.compare("1.2") > 0) {
         throw std::invalid_argument("this analyzer only supports up to cQASM 1.2");
     }
+    */
 }
 
 /**
@@ -53,9 +56,12 @@ Analyzer::Analyzer(const std::string &api_version)
 Analyzer::Analyzer(const primitives::Version &api_version)
     : api_version(api_version), resolve_instructions(false), resolve_error_model(false)
 {
+    // QI2 integration test: temporarily removed this check
+    /*
     if (api_version.compare("1.2") > 0) {
         throw std::invalid_argument("this analyzer only supports up to cQASM 1.2");
     }
+    */
 }
 
 
@@ -554,7 +560,7 @@ AnalyzerHelper::AnalyzerHelper(
         result.root->api_version = analyzer.api_version;
 
         // Check and set the version.
-        //analyze_version(*ast.version);
+        analyze_version(*ast.version);
 
         // Handle the qubits statement. Qubit variables can be used instead of
         // the qubits keyword, in which case num_qubits is set to 0 to indicate
