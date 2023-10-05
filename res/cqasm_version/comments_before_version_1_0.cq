@@ -1,0 +1,8 @@
+# Python-like single-line comment before the version statement
+// C++-like single-line comment before the version statement
+/* The version parser admits both kinds of single-line comments
+ * Notice, however, that a v1 parser will fail when encountering C++-like single-line comments
+ * Likewise, a v3 parser will fail when encountering Python-like single-line comments
+ */
+
+version 1.0

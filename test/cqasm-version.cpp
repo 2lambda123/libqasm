@@ -65,6 +65,12 @@ TEST(parse_file, version_1_0_and_instruction) {
 TEST(parse_file, instruction_and_version_1_0) {
     EXPECT_THROW(parse_file("res/cqasm_version/instruction_and_version_1_0.cq"), AnalysisError);
 }
+TEST(parse_file, comments_before_version_1_0) {
+    EXPECT_EQ(parse_file("res/cqasm_version/comments_before_version_1_0.cq"), Version{ "1.0" });
+}
+TEST(parse_file, comments_before_version_3_0) {
+    EXPECT_EQ(parse_file("res/cqasm_version/comments_before_version_3_0.cq"), Version{ "3.0" });
+}
 
 
 TEST(parse_file, fp_does_not_exist) {
@@ -169,6 +175,16 @@ TEST(parse_file, fp_empty_and_no_filename_argument) {
         EXPECT_THAT(err.get_message(), HasSubstr("<unknown>"));
     }
 }
+TEST(parse_file, fp_comments_before_version_1_0) {
+    const char *filename{ "res/cqasm_version/comments_before_version_1_0.cq" };
+    FILE *fp{ fopen(filename, "r") };
+    EXPECT_EQ(parse_file(fp, filename), Version{ "1.0" });
+}
+TEST(parse_file, fp_comments_before_version_3_0) {
+    const char *filename{ "res/cqasm_version/comments_before_version_3_0.cq" };
+    FILE *fp{ fopen(filename, "r") };
+    EXPECT_EQ(parse_file(fp, filename), Version{ "3.0" });
+}
 
 
 TEST(parse_string, string_empty) {
@@ -248,6 +264,14 @@ TEST(parse_string, string_empty_and_no_filename_argument) {
     } catch (const AnalysisError &err) {
         EXPECT_THAT(err.get_message(), HasSubstr("<unknown>"));
     }
+}
+TEST(parse_string, string_comments_before_version_1_0) {
+    const std::string filename{ "res/cqasm_version/comments_before_version_1_0.cq" };
+    EXPECT_EQ(parse_string("# foo\n// blah\n/* meh\n *ouw\n */\n\nversion 1.0", filename), Version{ "1.0" });
+}
+TEST(parse_string, string_comments_before_version_3_0) {
+    const std::string filename{ "res/cqasm_version/comments_before_version_3_0.cq" };
+    EXPECT_EQ(parse_string("# foo\n// blah\n/* meh\n *ouw\n */\n\nversion 3.0", filename), Version{ "3.0" });
 }
 
 
