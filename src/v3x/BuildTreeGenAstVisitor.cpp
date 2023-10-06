@@ -45,7 +45,6 @@ double BuildTreeGenAstVisitor::get_float_value(size_t line, size_t char_position
 
 double BuildTreeGenAstVisitor::get_float_value(antlr4::tree::TerminalNode *node) {
     const auto &token = node->getSymbol();
-    const auto &text = node->getText();
     assert(token->getType() == CqasmParser::FLOAT);
     return get_float_value(token->getLine(), token->getCharPositionInLine(), node->getText());
 }
